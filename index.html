@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>无障碍出行伴侣 · 城市版</title>
+    <!-- Leaflet CSS + JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="map" style="height: 500px; width: 100%;"></div>
+    <div id="control-panel">
+        <button id="voiceBtn">🎤 语音导航</button>
+        <button id="sosBtn">🆘 SOS一键求助</button>
+        <button id="reportBtn">📝 上报障碍物</button>
+        <a href="admin.html" target="_blank">⚙️ 管理员面板</a>
+    </div>
+    <div id="status"></div>
+
+    <!-- 先加载数据定义，再加载地图逻辑 -->
+    <script src="mockData.js"></script>
+    <script>
+        // 简单的全局检查
+        if (typeof poiList === 'undefined') {
+            document.getElementById('status').innerText = '错误：mockData.js 未加载，请检查文件是否存在';
+        }
+    </script>
+    <script src="app.js"></script>
+    <button id="statsBtn">📊 数据看板</button>
+<div id="chartModal" style="display:none; position:fixed; top:20%; left:10%; width:80%; background:white; border:1px solid #ccc; padding:20px; z-index:2000;">
+    <span id="closeModal" style="float:right; cursor:pointer;">✖️</span>
+    <div id="coverageChart" style="height:300px;"></div>
+    <div id="trendChart" style="height:300px;"></div>
+</div>
+<div id="privacyModal" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:20px; max-width:80%; border-radius:12px;">
+        <h3>隐私保护声明</h3>
+        <p>您的所有数据（包括位置、上报记录）仅存储在您的手机本地，不会上传至任何服务器。您可以随时在设置中清除数据。</p>
+        <button id="agreePrivacy">同意并继续</button>
+    </div>
+</div>
+<button id="clearDataBtn" style="position:fixed; bottom:80px; right:10px; background:gray;">🗑️ 清除我的数据</button>
+</body>
+</html>
