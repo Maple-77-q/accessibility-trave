@@ -6,13 +6,7 @@ const poiList = [
     { id: 4, name: "万达广场", lat: 31.2350, lng: 121.4500, score: 3.9, hasElevator: true, hasRamp: false, type: "商场" }
 ];
 
-// 模拟障碍物（初始）
-let obstacles = [
-    { id: 101, lat: 31.2280, lng: 121.4700, type: "台阶", status: "未处理", reportTime: "2025-04-08" },
-    { id: 102, lat: 31.2330, lng: 121.4600, type: "坡道损坏", status: "处理中", reportTime: "2025-04-09" }
-];
-
-// 电梯/坡道实时状态（用于动态演示）
+// 电梯/坡道实时状态
 let facilityStatus = {
     "市民中心图书馆": { elevator: "正常", ramp: "正常" },
     "中山公园地铁站A口": { elevator: "维修中", ramp: "无" },
@@ -20,12 +14,48 @@ let facilityStatus = {
     "万达广场": { elevator: "正常", ramp: "维修中" }
 };
 
-// 辅助函数：保存障碍物到localStorage
+// 障碍物数据（初始）
+let obstacles = [
+    { id: 101, lat: 31.2280, lng: 121.4700, type: "台阶", description: "图书馆南门三级台阶", status: "未处理", reportTime: "2025-04-08", photo: null },
+    { id: 102, lat: 31.2330, lng: 121.4600, type: "坡道损坏", description: "万达广场侧门坡道破损", status: "处理中", reportTime: "2025-04-09", photo: null }
+];
+
+// 存储操作
 function saveObstacles() {
     localStorage.setItem('obstacles', JSON.stringify(obstacles));
 }
 function loadObstacles() {
     const stored = localStorage.getItem('obstacles');
-    if (stored) obstacles = JSON.parse(stored);
+    if (stored) {
+        try {
+            obstacles = JSON.parse(stored);
+        } catch(e) { console.warn("解析存储数据失败"); }
+    }
 }
 loadObstacles();
+
+// 存储高对比度偏好
+function saveContrastPref(enabled) {
+    localStorage.setItem('highContrast', enabled);
+}
+function loadContrastPref() {
+    return localStorage.getItem('highContrast') === 'true';
+}
+
+// 简易路网（用于路径规划）
+// 节点ID: 1=图书馆, 2=地铁站, 3=医院, 4=万达广场
+const graph = {
+    nodes: {
+        1: { name: "市民中心图书馆", lat: 31.2304, lng: 121.4737 },
+        2: { name: "中山公园地铁站A口", lat: 31.2223, lng: 121.4642 },
+        3: { name: "第一人民医院", lat: 31.2401, lng: 121.4805 },
+        4: { name: "万达广场", lat: 31.2350, lng: 121.4500 }
+    },
+    edges: [
+        { from: 1, to: 2, distance: 1.2, accessible: true },   // 图书馆-地铁，有坡道
+        { from: 1, to: 3, distance: 0.9, accessible: true },   // 图书馆-医院
+        { from: 2, to: 4, distance: 1.5, accessible: false },  // 地铁-万达，有台阶
+        { from: 3, to: 4, distance: 2.0, accessible: true },   // 医院-万达
+        { from: 1, to: 4, distance: 2.2, accessible: false }   // 图书馆-万达，部分台阶
+    ]
+};
